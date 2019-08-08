@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'globle.dart' as Globle;
 import 'view/mainpage.dart';
@@ -15,12 +14,6 @@ class MyApp extends StatelessWidget {
   }
 
   _loadConfig() async {
-    //获取设置
-//    String configStr = await _loadConfigObj();
-//    print("configStr: " + configStr);
-//    final configResponse = json.decode(configStr);
-//    globle.serverPath = configResponse["serverPath"];
-
     //获取登录信息
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -34,10 +27,6 @@ class MyApp extends StatelessWidget {
       print(exception.toString());
     }
 
-  }
-
-  Future<String> _loadConfigObj() async {
-    return await rootBundle.loadString('static/json/config.json');
   }
 
   // This widget is the root of your application.

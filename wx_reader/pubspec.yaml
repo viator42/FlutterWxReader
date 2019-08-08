@@ -45,7 +45,6 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - static/json/config.json
     - static/img/banner_bg.png
     - static/img/ic_book.png
     - static/img/ic_headimg.png

@@ -65,6 +65,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                 heightFactor: 1.0,
                 child: (_pop != null)?Image.network(
                     serverPath + _pop.background,
+                    fit: BoxFit.cover,
                 ):Image.asset('static/img/dummy.png', fit: BoxFit.fill,)
               ),
               Positioned(
@@ -304,18 +305,15 @@ class _DiscoverPageState extends State<DiscoverPage> {
       }
     }
 
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
+    return Scaffold(
+      appBar: CupertinoNavigationBar(
         middle: Text('探索'),
       ),
-      child: Stack(
+      body: Stack(
         children: <Widget>[
           DefaultTabController(
               length: pageList.length,
-              child: Padding(
-                  padding: EdgeInsets.fromLTRB(0, 48.0, 0, 0),
-                  child: TabBarView(children: pageList)
-              )
+              child: TabBarView(children: pageList),
           ),
           Opacity(
             opacity: isLoading? 1.0: 0.0,
