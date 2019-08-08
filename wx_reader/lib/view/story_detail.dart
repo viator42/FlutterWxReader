@@ -21,10 +21,14 @@ class StoryDetailPage extends StatefulWidget {
 class _StoryDetailState extends State<StoryDetailPage> {
   int id;
   News _news;
+  bool _isLoading = false;
 
   _StoryDetailState(this.id);
 
   _load() async {
+    setState(() {
+      _isLoading = true;
+    });
     var httpClient = HttpClient();
     try {
       var request = await httpClient.getUrl(
@@ -35,6 +39,7 @@ class _StoryDetailState extends State<StoryDetailPage> {
       var data = jsonDecode(json);
       print(data['news']);
       setState(() {
+        _isLoading = false;
         _news = News.fromJson(data['news']);
       });
     }
@@ -64,10 +69,23 @@ class _StoryDetailState extends State<StoryDetailPage> {
         ),
         middle: Text('故事详情'),
       ),
-      body: Center(
-        child: (_news!=null)?HtmlView(
-          data: _news.content,
-        ):null,
+      body: Stack(
+        children: <Widget>[
+          Center(
+            child: (_news!=null)?HtmlView(
+              data: _news.content,
+            ):null,
+          ),
+          Opacity(
+            opacity: _isLoading? 1.0: 0.0,
+            child: Center(
+              child: CupertinoActivityIndicator(
+                radius: 18.0,
+                animating: _isLoading,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

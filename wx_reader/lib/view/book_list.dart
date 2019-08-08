@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:wx_reader/utils/static_values.dart';
 import 'package:wx_reader/model/book.dart';
 import 'book_details.dart';
+import 'package:lazy_load_scrollview/lazy_load_scrollview.dart';
 
 class BookListPage extends StatefulWidget {
   int category;
@@ -22,25 +23,51 @@ class BookListPage extends StatefulWidget {
 
 class _BookListPageState extends State<BookListPage> {
   int category;
-  int page = 0;
-  BookList _bookList;
+  bool _isLoading = false;
+  bool _nomoreData =false;
+  int _currentPage = 0;
+  List<Book> _bookList = [];
   String title = '图书列表';
 
   _BookListPageState(this.category, this.title);
 
+  _reload() {
+    _nomoreData = false;
+    _currentPage = 0;
+    _bookList.clear();
+    _load();
+  }
+
   _load() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     var httpClient = HttpClient();
     try {
       var request = await httpClient.getUrl(
-          Uri.parse(serverPath + '/app/book/category/books/?page=' + page.toString() + '&category=' + category.toString()));
+          Uri.parse(serverPath + '/app/book/category/books/?page=$_currentPage&category=$category'));
       var response = await request.close();
 
       var json = await response.transform(utf8.decoder).join();
       var data = jsonDecode(json);
       print(data);
+
       setState(() {
-        _bookList = BookList.fromJson(data);
+        _isLoading = false;
       });
+
+      List<Book> appends = BookList.fromJson(data).list;
+
+      if(!appends.isEmpty) {
+        setState(() {
+          _bookList.addAll(appends);
+          _currentPage += 1;
+        });
+      }
+      else {
+        _nomoreData = true;
+      }
 
     }
     catch(exception) {
@@ -52,7 +79,7 @@ class _BookListPageState extends State<BookListPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _load();
+    _reload();
   }
 
   @override
@@ -69,50 +96,77 @@ class _BookListPageState extends State<BookListPage> {
         ),
         middle: Text(title),
       ),
-      body: (_bookList != null)? GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          mainAxisSpacing: 8.0,
-          crossAxisSpacing: 8.0,
-          childAspectRatio: 0.8,
-        ),
-        itemBuilder: (context, index) {
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(
-                      fullscreenDialog: true,
-                      builder: (context) => BookDetailsPage(id: _bookList.list[index].id))
-              );
+      body: Stack(
+        children: <Widget>[
+          LazyLoadScrollView(
+            child: (_bookList != null)? GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 8.0,
+                crossAxisSpacing: 8.0,
+                childAspectRatio: 0.8,
+              ),
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(
+                            fullscreenDialog: true,
+                            builder: (context) => BookDetailsPage(id: _bookList[index].id))
+                    );
+                  },
+                  child: SizedBox(
+                    child: Card(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            child: Image.network(serverPath + _bookList[index].cover,
+                              fit: BoxFit.fitWidth,
+                              height: 180.0,
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0),
+                            child: Center(
+                              child: Text(
+                                _bookList[index].name,
+                                maxLines: 3,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+              itemCount: _bookList.length,
+            ):null,
+
+            onEndOfPage: () {
+              print('load more page: $_currentPage');
+              if(_nomoreData) {
+                return;
+              }
+              if(!_isLoading) {
+                _load();
+              }
             },
-            child: SizedBox(
-              child: Card(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                      child: Image.network(serverPath + _bookList.list[index].cover,
-                        fit: BoxFit.fitWidth,
-                        height: 180.0,
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0),
-                      child: Center(
-                        child: Text(
-                          _bookList.list[index].name,
-                          maxLines: 3,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+          ),
+
+          Opacity(
+            opacity: _isLoading? 1.0: 0.0,
+            child: Center(
+              child: CupertinoActivityIndicator(
+                radius: 18.0,
+                animating: _isLoading,
               ),
             ),
-          );
-        },
-        itemCount: _bookList.list.length,
-      ):null,
+          ),
+
+        ],
+      ),
     );
   }
 

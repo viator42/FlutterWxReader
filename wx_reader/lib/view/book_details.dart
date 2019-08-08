@@ -23,10 +23,14 @@ class _BookDetailsState extends State<BookDetailsPage> {
   int id;
   Book _book;
   BookCommentList _bookCommentList;
+  bool _isLoading = false;
 
   _BookDetailsState(this.id);
 
   _load() async {
+    setState(() {
+      _isLoading = true;
+    });
     var httpClient = HttpClient();
     try {
       var request = await httpClient.getUrl(
@@ -48,6 +52,7 @@ class _BookDetailsState extends State<BookDetailsPage> {
       data = jsonDecode(json);
       print(data);
       setState(() {
+        _isLoading = false;
         _bookCommentList = BookCommentList.fromJson(data);
       });
 
@@ -126,18 +131,48 @@ class _BookDetailsState extends State<BookDetailsPage> {
                       ):null,
                     ),
                     SliverToBoxAdapter(
-                      child: ListTile(
-                        leading: Text('轻点评分'),
+                      child: (_book!=null)?ListTile(
+                        leading: Text('评分'),
                         title: Row(
                           children: <Widget>[
+                            (_book.rank < 1)?
+                            Icon(Icons.star_border):
+                            (_book.rank < 2)?
+                            Icon(Icons.star_half):
                             Icon(Icons.star),
+
+                            (_book.rank < 3)?
+                            Icon(Icons.star_border):
+                            (_book.rank < 4)?
+                            Icon(Icons.star_half):
                             Icon(Icons.star),
+
+                            (_book.rank < 5)?
+                            Icon(Icons.star_border):
+                            (_book.rank < 6)?
+                            Icon(Icons.star_half):
                             Icon(Icons.star),
+
+                            (_book.rank < 7)?
+                            Icon(Icons.star_border):
+                            (_book.rank < 8)?
+                            Icon(Icons.star_half):
                             Icon(Icons.star),
+
+                            (_book.rank < 9)?
+                            Icon(Icons.star_border):
+                            (_book.rank < 10)?
+                            Icon(Icons.star_half):
                             Icon(Icons.star),
+
+                            Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text(_book.rank.toString()),
+                            ),
+
                           ],
                         ),
-                      ),
+                      ):null,
                     ),
                     SliverToBoxAdapter(
                       child: (_book!=null)?
@@ -178,7 +213,27 @@ class _BookDetailsState extends State<BookDetailsPage> {
                                   color: Colors.blue,
                                   textColor: Colors.white,
                                   child: Text('立即购买'),
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return new Container(
+                                          height: 300.0,
+                                          child: Row(
+                                            children: <Widget>[
+                                              Text('立即购买'),
+                                              RaisedButton(
+                                                child: Text('立即购买'),
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
                                 ),
                               ),
                             ],
@@ -289,11 +344,19 @@ class _BookDetailsState extends State<BookDetailsPage> {
               )
             ],
           ),
+
+          Opacity(
+            opacity: _isLoading? 1.0: 0.0,
+            child: Center(
+              child: CupertinoActivityIndicator(
+                radius: 18.0,
+                animating: _isLoading,
+              ),
+            ),
+          ),
+
         ],
       ),
-      /*
-      body:
-      */
     );
   }
 
