@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wx_reader/utils/cache.dart';
 import 'globle.dart' as Globle;
 import 'view/mainpage.dart';
 import 'package:wx_reader/model/user.dart';
@@ -12,7 +11,6 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   MyApp() {
     _loadConfig();
-    Globle.cache = Cache();
   }
 
   _loadConfig() async {

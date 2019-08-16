@@ -7,7 +7,7 @@ import 'package:wx_reader/utils/styles.dart';
 import 'package:wx_reader/view/book_details.dart';
 import 'package:wx_reader/utils/static_values.dart';
 import 'package:wx_reader/model/book.dart';
-import 'package:wx_reader/globle.dart' as Globle;
+import 'package:wx_reader/globle.dart';
 
 class DiscoverPage extends StatefulWidget {
   DiscoverPage() : super(key: Key(Random().nextDouble().toString()));
@@ -23,47 +23,57 @@ class _DiscoverPageState extends State<DiscoverPage> {
   bool isLoading = false;
 
   initState() {
+    _reload();
+  }
+
+  _reload() {
     _load();
   }
 
-  _load() async {
+  _load() {
     String url = '/app/explorer/';
 
     setState(() {
       isLoading = true;
     });
 
-    //load from cache
-    var data = null;
-    String resultStr = Globle.cache.get(url);
-    if(resultStr != null && resultStr.isNotEmpty) {
-      data = jsonDecode(resultStr);
-    }
-    else {
-      //load from web
-      try {
-        var httpClient = HttpClient();
-        var request = await httpClient.getUrl(Uri.parse(serverPath + url));
-        var response = await request.close();
-
-        var json = await response.transform(utf8.decoder).join();
-        data = jsonDecode(json);
-
-        Globle.cache.put(url, jsonEncode(data), 0);
+    mapCache.get(url).then((value){
+      print('load from cache');
+      if(value != null && value.isNotEmpty) {
+        _set(jsonDecode(value));
       }
-      catch(exception) {
-        print('exception: ' + exception.toString());
+      else {
+        _loadFromWeb(url);
       }
-    }
 
+    });
+  }
+
+  _loadFromWeb(String url) async {
+    print('load from web');
+    try {
+      var data = null;
+      var httpClient = HttpClient();
+      var request = await httpClient.getUrl(Uri.parse(serverPath + url));
+      var response = await request.close();
+
+      var json = await response.transform(utf8.decoder).join();
+      data = jsonDecode(json);
+      mapCache.set(url, jsonEncode(data));
+      _set(data);
+    }
+    catch(exception) {
+      print('exception: ' + exception.toString());
+    }
+  }
+
+  _set(var data) {
     setState(() {
       isLoading = false;
       _pop = Pop.fromJson(data['pop']);
       _recommendList = RecommendList.fromJson(data['recommend']);
       _showcaseList = ShowcaseList.fromJson(data['showcase']);
     });
-
-
   }
 
   @override

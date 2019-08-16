@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:wx_reader/utils/static_values.dart';
 import 'package:wx_reader/model/book.dart';
 import 'book_list.dart';
+import 'package:wx_reader/globle.dart';
 
 class BookStorePage extends StatefulWidget {
 
@@ -24,53 +25,125 @@ class _BookStoreState extends State<BookStorePage> {
   GuessYouLikeList _guessYouLikeList;
   bool isLoading = false;
 
+  _reload() {
+    _load();
+  }
+
   _load() async {
     setState(() {
       isLoading = true;
     });
 
+    String categoryUrl = '/app/book/category/';
+    String recommendUrl = '/app/book/recommend/';
+    String guessYouLikeUrl = '/app/book/guessYouLike/';
+
+    mapCache.get(categoryUrl).then((value){
+      if(value != null && value.isNotEmpty) {
+        _setCategory(jsonDecode(value));
+      }
+      else {
+        _loadCategoryFromWeb(categoryUrl);
+      }
+    });
+
+    mapCache.get(recommendUrl).then((value){
+      if(value != null && value.isNotEmpty) {
+        _setRecommend(jsonDecode(value));
+      }
+      else {
+        _loadRecommendFromWeb(recommendUrl);
+      }
+    });
+
+    mapCache.get(guessYouLikeUrl).then((value){
+      if(value != null && value.isNotEmpty) {
+        _setGuessYouLike(jsonDecode(value));
+      }
+      else {
+        _loadGuessYouLikeFromWeb(guessYouLikeUrl);
+      }
+    });
+
+  }
+
+  _loadCategoryFromWeb(String url) async {
     var httpClient = HttpClient();
+    var data = null;
     try {
-      var request = await httpClient.getUrl(Uri.parse(serverPath + '/app/book/category/'));
+      var request = await httpClient.getUrl(Uri.parse(serverPath + url));
       var response = await request.close();
 
       var json = await response.transform(utf8.decoder).join();
-      var data = jsonDecode(json);
-      print(data);
-      _categoryList = CategoryList.fromJson(data);
-
-      var request2 = await httpClient.getUrl(Uri.parse(serverPath + '/app/book/recommend/'));
-      var response2 = await request2.close();
-
-      var json2 = await response2.transform(utf8.decoder).join();
-      var data2 = jsonDecode(json2);
-      print(data2);
-      _recommendList = RecommendList.fromJson(data2);
-
-      var request3 = await httpClient.getUrl(Uri.parse(serverPath + '/app/book/guessYouLike/'));
-      var response3 = await request3.close();
-
-      var json3 = await response3.transform(utf8.decoder).join();
-      var data3 = jsonDecode(json3);
-      print(data3);
-      _guessYouLikeList = GuessYouLikeList.fromJson(data3);
-
-      setState(() {
-        isLoading = false;
-        _categoryList;
-        _recommendList;
-        _guessYouLikeList;
-      });
+      data = jsonDecode(json);
+      mapCache.set(url, jsonEncode(data));
+      _setCategory(data);
     }
     catch(exception) {
       print('exception: ' + exception.toString());
     }
   }
 
+  _setCategory(var data) {
+    setState(() {
+      isLoading = false;
+      _categoryList = CategoryList.fromJson(data);
+    });
+  }
+
+  _loadRecommendFromWeb(String url) async {
+    var httpClient = HttpClient();
+    var data = null;
+    try {
+      var request = await httpClient.getUrl(Uri.parse(serverPath + url));
+      var response = await request.close();
+
+      var json = await response.transform(utf8.decoder).join();
+      data = jsonDecode(json);
+      mapCache.set(url, jsonEncode(data));
+      _setRecommend(data);
+    }
+    catch(exception) {
+      print('exception: ' + exception.toString());
+    }
+  }
+
+  _setRecommend(var data) {
+    setState(() {
+      isLoading = false;
+      _recommendList = RecommendList.fromJson(data);
+    });
+  }
+
+  _loadGuessYouLikeFromWeb(String url) async {
+    var httpClient = HttpClient();
+    var data = null;
+    try {
+      var request = await httpClient.getUrl(Uri.parse(serverPath + url));
+      var response = await request.close();
+
+      var json = await response.transform(utf8.decoder).join();
+      data = jsonDecode(json);
+      mapCache.set(url, jsonEncode(data));
+      _setGuessYouLike(data);
+    }
+    catch(exception) {
+      print('exception: ' + exception.toString());
+    }
+
+  }
+
+  _setGuessYouLike(var data) {
+    setState(() {
+      isLoading = false;
+      _guessYouLikeList = GuessYouLikeList.fromJson(data);
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    _load();
+    _reload();
   }
 
   @override

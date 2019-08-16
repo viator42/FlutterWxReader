@@ -1,9 +1,9 @@
 import 'package:sqflite/sqflite.dart';
 
-class Cache {
+class DataProvider {
   var _db = null;
 
-  Cache() {
+  DataProvider() {
     _init();
   }
 
