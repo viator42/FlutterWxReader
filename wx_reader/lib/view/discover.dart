@@ -7,6 +7,7 @@ import 'package:wx_reader/utils/styles.dart';
 import 'package:wx_reader/view/book_details.dart';
 import 'package:wx_reader/utils/static_values.dart';
 import 'package:wx_reader/model/book.dart';
+import 'package:wx_reader/globle.dart' as Globle;
 
 class DiscoverPage extends StatefulWidget {
   DiscoverPage() : super(key: Key(Random().nextDouble().toString()));
@@ -26,29 +27,43 @@ class _DiscoverPageState extends State<DiscoverPage> {
   }
 
   _load() async {
+    String url = '/app/explorer/';
+
     setState(() {
       isLoading = true;
     });
 
-    var httpClient = HttpClient();
-    try {
-      var request = await httpClient.getUrl(Uri.parse(serverPath + '/app/explorer/'));
-      var response = await request.close();
-
-      var json = await response.transform(utf8.decoder).join();
-      var data = jsonDecode(json);
-      print(data);
-      setState(() {
-          isLoading = false;
-         _pop = Pop.fromJson(data['pop']);
-         _recommendList = RecommendList.fromJson(data['recommend']);
-         _showcaseList = ShowcaseList.fromJson(data['showcase']);
-      });
-
+    //load from cache
+    var data = null;
+    String resultStr = Globle.cache.get(url);
+    if(resultStr != null && resultStr.isNotEmpty) {
+      data = jsonDecode(resultStr);
     }
-    catch(exception) {
-      print('exception: ' + exception.toString());
+    else {
+      //load from web
+      try {
+        var httpClient = HttpClient();
+        var request = await httpClient.getUrl(Uri.parse(serverPath + url));
+        var response = await request.close();
+
+        var json = await response.transform(utf8.decoder).join();
+        data = jsonDecode(json);
+
+        Globle.cache.put(url, jsonEncode(data), 0);
+      }
+      catch(exception) {
+        print('exception: ' + exception.toString());
+      }
     }
+
+    setState(() {
+      isLoading = false;
+      _pop = Pop.fromJson(data['pop']);
+      _recommendList = RecommendList.fromJson(data['recommend']);
+      _showcaseList = ShowcaseList.fromJson(data['showcase']);
+    });
+
+
   }
 
   @override
