@@ -25,10 +25,8 @@ dependencies:
   sqflite: ^1.1.6+3
   quiver: '>=2.0.0 <3.0.0'
   cached_network_image: ^0.7.0
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
+  video_player:
 
 dev_dependencies:
   flutter_test:
