@@ -6,6 +6,7 @@ import 'package:wx_reader/utils/styles.dart';
 import 'package:wx_reader/utils/static_values.dart';
 import 'package:wx_reader/model/book.dart';
 import 'package:wx_reader/model/comment.dart';
+import 'package:wx_reader/globle.dart';
 
 class BookDetailsPage extends StatefulWidget {
   int id;
@@ -27,47 +28,90 @@ class _BookDetailsState extends State<BookDetailsPage> {
 
   _BookDetailsState(this.id);
 
+  _reload() {
+    _load();
+  }
+
   _load() async {
+    String detailUrl = '/app/book/detail/?id=' + id.toString();
+    String commentUrl = '/app/book/comment/?book=' + id.toString();
+
     setState(() {
       _isLoading = true;
     });
+
+    mapCache.get(detailUrl).then((value){
+      if(value != null && value.isNotEmpty) {
+        _setDetail(jsonDecode(value));
+      }
+      else {
+        _loadDetailFromWeb(detailUrl);
+      }
+    });
+
+    mapCache.get(commentUrl).then((value){
+      if(value != null && value.isNotEmpty) {
+        _setComment(jsonDecode(value));
+      }
+      else {
+        _loadCommentFromWeb(commentUrl);
+      }
+    });
+
+  }
+
+  _loadDetailFromWeb(String url) async {
     var httpClient = HttpClient();
     try {
       var request = await httpClient.getUrl(
-          Uri.parse(serverPath + '/app/book/detail/?id=' + id.toString()));
+          Uri.parse(serverPath + url));
       var response = await request.close();
 
       var json = await response.transform(utf8.decoder).join();
       var data = jsonDecode(json);
-      print(data['book']);
-      setState(() {
-        _book = Book.fromJson(data['book']);
-      });
-
-      request = await httpClient.getUrl(
-          Uri.parse(serverPath + '/app/book/comment/?book=' + id.toString()));
-      response = await request.close();
-
-      json = await response.transform(utf8.decoder).join();
-      data = jsonDecode(json);
-      print(data);
-      setState(() {
-        _isLoading = false;
-        _bookCommentList = BookCommentList.fromJson(data);
-      });
-
+      mapCache.set(url, jsonEncode(data));
+      _setDetail(data);
     }
     catch(exception) {
       print('exception: ' + exception.toString());
     }
   }
 
+  _setDetail(var data) {
+    setState(() {
+      _book = Book.fromJson(data['book']);
+    });
+  }
+
+  _loadCommentFromWeb(String url) async {
+    var httpClient = HttpClient();
+    try {
+      var request = await httpClient.getUrl(
+          Uri.parse(serverPath + url));
+      var response = await request.close();
+
+      var json = await response.transform(utf8.decoder).join();
+      var data = jsonDecode(json);
+      mapCache.set(url, jsonEncode(data));
+      _setComment(data);
+    }
+    catch(exception) {
+      print('exception: ' + exception.toString());
+    }
+  }
+
+  _setComment(var data) {
+    setState(() {
+      _isLoading = false;
+      _bookCommentList = BookCommentList.fromJson(data);
+    });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _load();
-    print(id);
+    _reload();
   }
 
   @override

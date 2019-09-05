@@ -1,8 +1,8 @@
 # FlutterWxReader
 
-迫于学习Flutter开发的仿微信读书客户端，尽力还原原版的UI界面。    
-开源部分只包含前端，后端也是自己编写的但不开放源码（只作为展示数据使用没多少功能逻辑）    
-目前只完成了部分界面，其他功能正在不断更新中    
+学习Flutter开发的仿微信读书客户端，尽力还原原版的UI界面。    
+开源部分只包含前端，后端也是自己编写的但不开放源码（只作为展示数据使用没多少功能逻辑）。    
+目前只完成了部分界面，其他功能正在不断更新中。    
 
 ### 已经完成的页面
 
@@ -15,6 +15,10 @@
 ### 开发环境
 
 > Flutter SDK 1.7.8+hotfix.4 Android Studio 3.4.2 with Flutter and Dart plugin
+
+### 下载链接
+
+[Android APK](https://github.com/viator42/FlutterWxReader/blob/master/WxReader.apk?raw=true)
 
 ### 预览图
 

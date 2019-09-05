@@ -8,6 +8,7 @@ import 'package:wx_reader/model/news.dart';
 import 'package:wx_reader/utils/styles.dart';
 import 'story_detail.dart';
 import 'package:lazy_load_scrollview/lazy_load_scrollview.dart';
+import 'package:wx_reader/globle.dart';
 
 class StoryPage extends StatefulWidget {
   StoryPage() : super(key: Key(Random().nextDouble().toString()));
@@ -36,39 +37,55 @@ class _StoryPageState extends State<StoryPage> {
   }
 
   _load() async {
+    String url = '/app/news/?page=$_currentPage';
+
     setState(() {
       _isLoading = true;
     });
+
+    mapCache.get(url).then((value){
+      if(value != null && value.isNotEmpty) {
+        _set(jsonDecode(value));
+      }
+      else {
+        _loadFromWeb(url);
+      }
+    });
+
+  }
+
+  _loadFromWeb(String url) async {
     var httpClient = HttpClient();
     try {
-      var request = await httpClient.getUrl(Uri.parse(serverPath + '/app/news/?page=$_currentPage'));
+      var request = await httpClient.getUrl(Uri.parse(serverPath + url));
       var response = await request.close();
 
       var json = await response.transform(utf8.decoder).join();
       var data = jsonDecode(json);
-      print(data);
-
-      setState(() {
-        _isLoading = false;
-      });
-
-      List<News> appends = NewsList.fromJson(data).list;
-
-      if(!appends.isEmpty) {
-        setState(() {
-          _newsList.addAll(appends);
-          _currentPage += 1;
-        });
-      }
-      else {
-        _nomoreData = true;
-      }
-
+      mapCache.set(url, jsonEncode(data));
+      _set(data);
     }
     catch(exception) {
       print('exception: ' + exception.toString());
     }
+  }
 
+  _set(var data) {
+    setState(() {
+      _isLoading = false;
+    });
+
+    List<News> appends = NewsList.fromJson(data).list;
+
+    if(!appends.isEmpty) {
+      setState(() {
+        _newsList.addAll(appends);
+        _currentPage += 1;
+      });
+    }
+    else {
+      _nomoreData = true;
+    }
   }
 
   @override

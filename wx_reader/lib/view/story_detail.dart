@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:wx_reader/utils/static_values.dart';
 import 'package:wx_reader/model/news.dart';
 import 'package:flutter_html_view/flutter_html_view.dart';
+import 'package:wx_reader/globle.dart';
 
 class StoryDetailPage extends StatefulWidget {
   int id;
@@ -25,34 +26,57 @@ class _StoryDetailState extends State<StoryDetailPage> {
 
   _StoryDetailState(this.id);
 
+  _reload() {
+    _load();
+  }
+
   _load() async {
+    String url = '/app/news/detail/?id=' + id.toString();
+
     setState(() {
       _isLoading = true;
     });
+
+    mapCache.get(url).then((value){
+      if(value != null && value.isNotEmpty) {
+        _set(jsonDecode(value));
+      }
+      else {
+        _loadFromWeb(url);
+      }
+    });
+
+  }
+
+  _loadFromWeb(String url) async {
     var httpClient = HttpClient();
     try {
       var request = await httpClient.getUrl(
-          Uri.parse(serverPath + '/app/news/detail/?id=' + id.toString()));
+          Uri.parse(serverPath + url));
       var response = await request.close();
 
       var json = await response.transform(utf8.decoder).join();
       var data = jsonDecode(json);
-      print(data['news']);
-      setState(() {
-        _isLoading = false;
-        _news = News.fromJson(data['news']);
-      });
+      mapCache.set(url, jsonEncode(data));
+      _set(data);
     }
     catch(exception) {
       print('exception: ' + exception.toString());
     }
   }
 
+  _set(var data) {
+    setState(() {
+      _isLoading = false;
+      _news = News.fromJson(data['news']);
+    });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _load();
+    _reload();
   }
 
   @override

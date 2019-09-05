@@ -6,6 +6,7 @@ import 'package:wx_reader/utils/static_values.dart';
 import 'package:wx_reader/model/book.dart';
 import 'book_details.dart';
 import 'package:lazy_load_scrollview/lazy_load_scrollview.dart';
+import 'package:wx_reader/globle.dart';
 
 class BookListPage extends StatefulWidget {
   int category;
@@ -38,40 +39,58 @@ class _BookListPageState extends State<BookListPage> {
     _load();
   }
 
-  _load() async {
+  _load() {
+    String url = '/app/book/category/books/?page=$_currentPage&category=$category';
+
     setState(() {
       _isLoading = true;
     });
 
+    mapCache.get(url).then((value){
+      print('load from cache');
+      if(value != null && value.isNotEmpty) {
+        _set(jsonDecode(value));
+      }
+      else {
+        _loadFromWeb(url);
+      }
+    });
+
+  }
+
+  _loadFromWeb(String url) async {
     var httpClient = HttpClient();
     try {
+      var data = null;
       var request = await httpClient.getUrl(
-          Uri.parse(serverPath + '/app/book/category/books/?page=$_currentPage&category=$category'));
+          Uri.parse(serverPath + url));
       var response = await request.close();
 
       var json = await response.transform(utf8.decoder).join();
-      var data = jsonDecode(json);
-      print(data);
-
-      setState(() {
-        _isLoading = false;
-      });
-
-      List<Book> appends = BookList.fromJson(data).list;
-
-      if(!appends.isEmpty) {
-        setState(() {
-          _bookList.addAll(appends);
-          _currentPage += 1;
-        });
-      }
-      else {
-        _nomoreData = true;
-      }
-
+      data = jsonDecode(json);
+      mapCache.set(url, jsonEncode(data));
+      _set(data);
     }
     catch(exception) {
       print('exception: ' + exception.toString());
+    }
+  }
+
+  _set(var data) {
+    setState(() {
+      _isLoading = false;
+    });
+
+    List<Book> appends = BookList.fromJson(data).list;
+
+    if(!appends.isEmpty) {
+      setState(() {
+        _bookList.addAll(appends);
+        _currentPage += 1;
+      });
+    }
+    else {
+      _nomoreData = true;
     }
   }
 
