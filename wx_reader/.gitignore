@@ -70,3 +70,14 @@
 !**/ios/**/default.pbxuser
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
+
+**/ios/**/*.xcconfig
+**/ios/**/*.pbxproj
+**/ios/**/*.xcworkspacedata
+pubspec.lock
+Pods
+**/ios/Podfile
+**/ios/Podfile.lock
+**/ios/Runner.xcworkspace/xcshareddata/
+
+**/ios/**/*.storyboard
