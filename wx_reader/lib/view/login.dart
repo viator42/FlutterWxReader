@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:wx_reader/utils/static_values.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wx_reader/model/user.dart';
+import 'register.dart';
 import 'package:wx_reader/globle.dart' as globle;
 
 class LoginPage extends StatefulWidget {
@@ -46,6 +47,16 @@ class _LoginPageState extends State<LoginPage> {
                   Icons.arrow_back_ios),
             ),
             middle: Text('登录'),
+            trailing: GestureDetector(
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(
+                        fullscreenDialog: true,
+                        builder: (context) => RegisterPage())
+                );
+              },
+              child: Text('注册'),
+            ),
           ),
           body: Align(
             alignment: FractionalOffset(0.5, 0.5),
