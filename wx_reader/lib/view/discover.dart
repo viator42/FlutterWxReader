@@ -80,7 +80,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
   Widget build(BuildContext context) {
     List<Widget> pageList = <Widget>[
       Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(8.0),
         child: Card(
           child: Stack(
             children: <Widget>[
@@ -151,13 +151,13 @@ class _DiscoverPageState extends State<DiscoverPage> {
                               );
                             },
                             child: Container(
-                              height: 240.0,
+                              height: 210.0,
                               child: Card(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: <Widget>[
                                     SizedBox(
-                                      height: 180.0,
+                                      height: 170.0,
 
                                       child: (_recommendList != null)?Image.network(
                                         serverPath + _recommendList.list[0].cover,
@@ -167,7 +167,11 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                     Container(
                                       padding: EdgeInsets.fromLTRB(0, 4.0, 0, 0),
                                       child: Text(
-                                        (_recommendList != null)?_recommendList.list[0].name:"",
+                                        (_recommendList != null)?
+                                            _recommendList.list[0].name.length > 10?
+                                              _recommendList.list[0].name.substring(0, 9) + '...':
+                                              _recommendList.list[0].name
+                                            :"",
                                       ),
 
                                     ),
@@ -186,13 +190,13 @@ class _DiscoverPageState extends State<DiscoverPage> {
                               );
                             },
                             child: Container(
-                              height: 240.0,
+                              height: 210.0,
                               child: Card(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: <Widget>[
                                     SizedBox(
-                                      height: 180.0,
+                                      height: 170.0,
                                       child: (_recommendList != null)?Image.network(
                                         serverPath + _recommendList.list[1].cover,
                                         fit: BoxFit.fill,
@@ -201,7 +205,11 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                     Container(
                                       padding: EdgeInsets.fromLTRB(0, 4.0, 0, 0),
                                       child: Text(
-                                        (_recommendList != null)?_recommendList.list[1].name:"",
+                                        (_recommendList != null)?
+                                        _recommendList.list[1].name.length > 10?
+                                        _recommendList.list[1].name.substring(0, 9) + '...':
+                                        _recommendList.list[1].name
+                                            :"",
                                       ),
 
                                     ),
@@ -223,13 +231,13 @@ class _DiscoverPageState extends State<DiscoverPage> {
                               );
                             },
                             child: Container(
-                              height: 240.0,
+                              height: 210.0,
                               child: Card(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: <Widget>[
                                     SizedBox(
-                                      height: 180.0,
+                                      height: 170.0,
                                       child: (_recommendList != null)?Image.network(
                                         serverPath + _recommendList.list[2].cover,
                                         fit: BoxFit.fill,
@@ -238,7 +246,11 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                     Container(
                                       padding: EdgeInsets.fromLTRB(0, 4.0, 0, 0),
                                       child: Text(
-                                        (_recommendList != null)?_recommendList.list[2].name:"",
+                                        (_recommendList != null)?
+                                        _recommendList.list[2].name.length > 10?
+                                        _recommendList.list[2].name.substring(0, 9) + '...':
+                                        _recommendList.list[2].name
+                                            :"",
                                       ),
 
                                     ),
@@ -256,13 +268,13 @@ class _DiscoverPageState extends State<DiscoverPage> {
                               );
                             },
                             child: Container(
-                              height: 240.0,
+                              height: 210.0,
                               child: Card(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: <Widget>[
                                     SizedBox(
-                                      height: 180.0,
+                                      height: 170.0,
                                       child: (_recommendList != null)?Image.network(
                                         serverPath + _recommendList.list[3].cover,
                                         fit: BoxFit.fill,
@@ -271,7 +283,11 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                     Container(
                                       padding: EdgeInsets.fromLTRB(0, 4.0, 0, 0),
                                       child: Text(
-                                        (_recommendList != null)?_recommendList.list[3].name:"",
+                                        (_recommendList != null)?
+                                        _recommendList.list[3].name.length > 10?
+                                        _recommendList.list[3].name.substring(0, 9) + '...':
+                                        _recommendList.list[3].name
+                                            :"",
                                       ),
 
                                     ),
@@ -320,7 +336,11 @@ class _DiscoverPageState extends State<DiscoverPage> {
                   Container(
                     padding: EdgeInsets.all(16.0),
                     child: Center(
-                      child: Text(showcase.trailing),
+                      child: Text(
+                          showcase.trailing.length > 150?
+                            showcase.trailing.substring(0, 150) + '...':
+                            showcase.trailing
+                      ),
                     ),
                   ),
                 ],
