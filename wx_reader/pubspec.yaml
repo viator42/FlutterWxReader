@@ -20,13 +20,14 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_html_view: ^0.5.12
-  shared_preferences: ^0.4.0
+  shared_preferences: ^0.5.3+4
   lazy_load_scrollview: 1.0.1
   sqflite: ^1.1.6+3
   quiver: '>=2.0.0 <3.0.0'
   cached_network_image: ^0.7.0
   cupertino_icons: ^0.1.2
   video_player:
+  dio: 3.0.2
 
 dev_dependencies:
   flutter_test:
