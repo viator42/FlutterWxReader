@@ -81,6 +81,7 @@ class _LoginPageState extends State<LoginPage> {
                       border: OutlineInputBorder(),
                       labelText: '密码',
                     ),
+                    obscureText: true,
                     controller: _passwordController,
                   ),
                 ),

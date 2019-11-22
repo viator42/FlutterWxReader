@@ -6,6 +6,7 @@ import 'login.dart';
 import 'package:wx_reader/globle.dart';
 import 'package:wx_reader/utils/static_values.dart';
 import 'profile_edit.dart';
+import 'settings.dart';
 
 class MinePage extends StatefulWidget {
   MinePage() : super(key: Key(Random().nextDouble().toString()));
@@ -20,7 +21,18 @@ class _MinePageState extends State<MinePage> {
   Widget build(BuildContext context) {
     return  CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
-            middle: Text('我的页面')
+            middle: Text('我的页面'),
+
+            trailing: GestureDetector(
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(
+                        fullscreenDialog: true,
+                        builder: (context) => SettingsPage())
+                );
+              },
+              child: Icon(Icons.settings),
+            ),
         ),
         child: CustomScrollView(
             slivers: <Widget>[
@@ -54,7 +66,7 @@ class _MinePageState extends State<MinePage> {
                                     builder: (context) => ProfileEditPage())
                             );
                           },
-                          child: Text('编辑个人资料',),
+                          child: Text('编辑个人资料'),
                         ),
 
                       ],
