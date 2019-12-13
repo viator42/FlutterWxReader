@@ -94,18 +94,18 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   _doRegister(tel, password) async {
-    Response data = await Api.register();
-    if(data != null) {
-      if(data.data['success']) {
-
-      }
-      else {
-
-      }
-    }
-    else {
-
-    }
+//    Response data = await Api.register();
+//    if(data != null) {
+//      if(data.data['success']) {
+//
+//      }
+//      else {
+//
+//      }
+//    }
+//    else {
+//
+//    }
 
 
     // 轮播图数据

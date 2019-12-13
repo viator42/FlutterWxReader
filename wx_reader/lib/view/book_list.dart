@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:convert';
@@ -6,7 +7,7 @@ import 'package:wx_reader/utils/static_values.dart';
 import 'package:wx_reader/model/book.dart';
 import 'book_details.dart';
 import 'package:lazy_load_scrollview/lazy_load_scrollview.dart';
-import 'package:wx_reader/globle.dart';
+import 'package:wx_reader/globle.dart' as globle;
 
 class BookListPage extends StatefulWidget {
   int category;
@@ -46,10 +47,10 @@ class _BookListPageState extends State<BookListPage> {
       _isLoading = true;
     });
 
-    mapCache.get(url).then((value){
+    globle.mapCache.get(url).then((value){
       print('load from cache');
       if(value != null && value.isNotEmpty) {
-        _set(jsonDecode(value));
+        _set(value);
       }
       else {
         _loadFromWeb(url);
@@ -59,6 +60,15 @@ class _BookListPageState extends State<BookListPage> {
   }
 
   _loadFromWeb(String url) async {
+    Response response = await globle.dio.get(url);
+    if(response != null) {
+      String dataStr = response.data;
+      print(dataStr);
+      _set(dataStr);
+      globle.mapCache.set(url, dataStr);
+    }
+
+    /*
     var httpClient = HttpClient();
     try {
       var data = null;
@@ -74,14 +84,15 @@ class _BookListPageState extends State<BookListPage> {
     catch(exception) {
       print('exception: ' + exception.toString());
     }
+     */
   }
 
-  _set(var data) {
+  _set(var dataStr) {
     setState(() {
       _isLoading = false;
     });
-
-    List<Book> appends = BookList.fromJson(data).list;
+    var data = json.decode(dataStr);
+    List<Book> appends = Book.decodeList(data);
 
     if(!appends.isEmpty) {
       setState(() {
@@ -190,7 +201,7 @@ class _BookListPageState extends State<BookListPage> {
   }
 
 }
-
+/*
 class BookList {
   List<Book> list = [];
 
@@ -204,3 +215,4 @@ class BookList {
     );
   }
 }
+ */

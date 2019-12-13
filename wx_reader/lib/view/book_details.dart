@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:wx_reader/api/api.dart';
 import 'package:wx_reader/utils/styles.dart';
 import 'package:wx_reader/utils/static_values.dart';
 import 'package:wx_reader/model/book.dart';
@@ -269,7 +271,7 @@ class _BookDetailsState extends State<BookDetailsPage> {
                                               RaisedButton(
                                                 child: Text('立即购买'),
                                                 onPressed: () {
-                                                  Navigator.pop(context);
+//                                                  Navigator.pop(context);
                                                 },
                                               ),
                                             ],
@@ -375,7 +377,10 @@ class _BookDetailsState extends State<BookDetailsPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     Expanded(
-                      child: FlatButton(onPressed: null, child: Text('添加到书架')),
+                      child: FlatButton(onPressed: () {
+                        _addToBookShelf();
+                      },
+                          child: Text('添加到书架')),
                     ),
                     Expanded(
                       child: FlatButton(onPressed: null, child: Text('开始阅读')),
@@ -402,6 +407,16 @@ class _BookDetailsState extends State<BookDetailsPage> {
         ],
       ),
     );
+  }
+
+  _addToBookShelf() async {
+//    Response data = await Api.listBookShelf();
+//    if(data != null) {
+//      print(data.data.toString());
+//    }
+//    else {
+//
+//    }
   }
 
 }

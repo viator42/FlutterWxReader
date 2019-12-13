@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:wx_reader/utils/styles.dart';
@@ -7,7 +8,7 @@ import 'dart:io';
 import 'package:wx_reader/utils/static_values.dart';
 import 'package:wx_reader/model/book.dart';
 import 'book_list.dart';
-import 'package:wx_reader/globle.dart';
+import 'package:wx_reader/globle.dart' as globle;
 
 class BookStorePage extends StatefulWidget {
 
@@ -20,9 +21,9 @@ class BookStorePage extends StatefulWidget {
 }
 
 class _BookStoreState extends State<BookStorePage> {
-  RecommendList _recommendList;
-  CategoryList _categoryList;
-  GuessYouLikeList _guessYouLikeList;
+  List<Book> _recommendList;
+  List<Category> _categoryList;
+  List<Book> _guessYouLikeList;
   bool isLoading = false;
 
   _reload() {
@@ -38,27 +39,28 @@ class _BookStoreState extends State<BookStorePage> {
     String recommendUrl = '/app/book/recommend/';
     String guessYouLikeUrl = '/app/book/guessYouLike/';
 
-    mapCache.get(categoryUrl).then((value){
+
+    globle.mapCache.get(categoryUrl).then((value){
       if(value != null && value.isNotEmpty) {
-        _setCategory(jsonDecode(value));
+        _setCategory(value);
       }
       else {
         _loadCategoryFromWeb(categoryUrl);
       }
     });
 
-    mapCache.get(recommendUrl).then((value){
+    globle.mapCache.get(recommendUrl).then((value){
       if(value != null && value.isNotEmpty) {
-        _setRecommend(jsonDecode(value));
+        _setRecommend(value);
       }
       else {
         _loadRecommendFromWeb(recommendUrl);
       }
     });
 
-    mapCache.get(guessYouLikeUrl).then((value){
+    globle.mapCache.get(guessYouLikeUrl).then((value){
       if(value != null && value.isNotEmpty) {
-        _setGuessYouLike(jsonDecode(value));
+        _setGuessYouLike(value);
       }
       else {
         _loadGuessYouLikeFromWeb(guessYouLikeUrl);
@@ -68,6 +70,15 @@ class _BookStoreState extends State<BookStorePage> {
   }
 
   _loadCategoryFromWeb(String url) async {
+    Response response = await globle.dio.get(url);
+    if(response != null) {
+      String dataStr = response.data;
+      print(dataStr);
+      _setCategory(dataStr);
+      globle.mapCache.set(url, dataStr);
+    }
+
+    /*
     var httpClient = HttpClient();
     var data = null;
     try {
@@ -82,16 +93,27 @@ class _BookStoreState extends State<BookStorePage> {
     catch(exception) {
       print('exception: ' + exception.toString());
     }
+
+     */
   }
 
-  _setCategory(var data) {
+  _setCategory(var dataStr) {
+    var data = json.decode(dataStr);
     setState(() {
       isLoading = false;
-      _categoryList = CategoryList.fromJson(data);
+      _categoryList = Category.decodeList(data);
     });
   }
 
   _loadRecommendFromWeb(String url) async {
+    Response response = await globle.dio.get(url);
+    if(response != null) {
+      String dataStr = response.data;
+      print(dataStr);
+      _setRecommend(dataStr);
+      globle.mapCache.set(url, dataStr);
+    }
+    /*
     var httpClient = HttpClient();
     var data = null;
     try {
@@ -100,22 +122,33 @@ class _BookStoreState extends State<BookStorePage> {
 
       var json = await response.transform(utf8.decoder).join();
       data = jsonDecode(json);
-      mapCache.set(url, jsonEncode(data));
+      globle.mapCache.set(url, jsonEncode(data));
       _setRecommend(data);
     }
     catch(exception) {
       print('exception: ' + exception.toString());
     }
+     */
   }
 
-  _setRecommend(var data) {
+  _setRecommend(var dataStr) {
+    var data = json.decode(dataStr);
     setState(() {
       isLoading = false;
-      _recommendList = RecommendList.fromJson(data);
+      _recommendList = Book.decodeList(data);
     });
   }
 
   _loadGuessYouLikeFromWeb(String url) async {
+    Response response = await globle.dio.get(url);
+    if(response != null) {
+      String dataStr = response.data;
+      print(dataStr);
+      _setGuessYouLike(dataStr);
+      globle.mapCache.set(url, dataStr);
+    }
+
+    /*
     var httpClient = HttpClient();
     var data = null;
     try {
@@ -124,19 +157,21 @@ class _BookStoreState extends State<BookStorePage> {
 
       var json = await response.transform(utf8.decoder).join();
       data = jsonDecode(json);
-      mapCache.set(url, jsonEncode(data));
+      globle.mapCache.set(url, jsonEncode(data));
       _setGuessYouLike(data);
     }
     catch(exception) {
       print('exception: ' + exception.toString());
     }
+         */
 
   }
 
-  _setGuessYouLike(var data) {
+  _setGuessYouLike(var dataStr) {
+    var data = json.decode(dataStr);
     setState(() {
       isLoading = false;
-      _guessYouLikeList = GuessYouLikeList.fromJson(data);
+      _guessYouLikeList = Book.decodeList(data);
     });
   }
 
@@ -188,15 +223,15 @@ class _BookStoreState extends State<BookStorePage> {
                                     Navigator.push(context,
                                         MaterialPageRoute(
                                             fullscreenDialog: true,
-                                            builder: (context) => BookDetailsPage(id: _guessYouLikeList.list[index].id))
+                                            builder: (context) => BookDetailsPage(id: _guessYouLikeList[index].id))
                                     );
                                   },
                                   child: Row(
                                     children: <Widget>[
-                                      Image.network(serverPath + _guessYouLikeList.list[index].cover),
+                                      Image.network(serverPath + _guessYouLikeList[index].cover),
                                       Padding(
                                         padding: EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
-                                        child: Text(_guessYouLikeList.list[index].name),
+                                        child: Text(_guessYouLikeList[index].name),
                                       )
 
                                     ],
@@ -205,7 +240,7 @@ class _BookStoreState extends State<BookStorePage> {
                               )
                           );
                         },
-                        childCount: _guessYouLikeList.list.length
+                        childCount: _guessYouLikeList.length
                     ),
                   ),
                 ),
@@ -246,7 +281,7 @@ class _BookStoreState extends State<BookStorePage> {
                             Navigator.push(context,
                                 MaterialPageRoute(
                                     fullscreenDialog: true,
-                                    builder: (context) => BookDetailsPage(id: _recommendList.list[index].id))
+                                    builder: (context) => BookDetailsPage(id: _recommendList[index].id))
                             );
                           },
                           child: Card(
@@ -254,7 +289,7 @@ class _BookStoreState extends State<BookStorePage> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: <Widget>[
                                 Container(
-                                  child: Image.network(serverPath + _recommendList.list[index].cover,
+                                  child: Image.network(serverPath + _recommendList[index].cover,
                                     fit: BoxFit.fitWidth,
                                     height: 180.0,
                                   ),
@@ -263,7 +298,7 @@ class _BookStoreState extends State<BookStorePage> {
                                   padding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0),
                                   child: Center(
                                     child: Text(
-                                      _recommendList.list[index].name,
+                                      _recommendList[index].name,
                                       maxLines: 3,
                                     ),
                                   ),
@@ -275,7 +310,7 @@ class _BookStoreState extends State<BookStorePage> {
 
                       );
                     },
-                    childCount: _recommendList.list.length,
+                    childCount: _recommendList.length,
                   ),
                 ),
 
@@ -303,18 +338,18 @@ class _BookStoreState extends State<BookStorePage> {
                               Navigator.push(context,
                                   MaterialPageRoute(
                                       fullscreenDialog: true,
-                                      builder: (context) => BookListPage(category: _categoryList.list[index].id, title: _categoryList.list[index].name))
+                                      builder: (context) => BookListPage(category: _categoryList[index].id, title: _categoryList[index].name))
                               );
                             },
                             child: Card(
                               child: Center(
-                                child: Text(_categoryList.list[index].name),
+                                child: Text(_categoryList[index].name),
                               ),
                             ),
                           )
                       );
                     },
-                    childCount: _categoryList.list.length,
+                    childCount: _categoryList.length,
                   ),
                 ),
 
@@ -359,15 +394,27 @@ class Category {
 
   Category({this.id, this.name, this.desp});
 
-  factory Category.fromJson(Map<String, dynamic> json) {
+  static fromJson(Map<String, dynamic> json) {
     return Category(
       id: json['id'],
       name: json['name'],
       desp: json['desp'],
     );
   }
+
+  static List<Category> decodeList(var jsonData) {
+    List<Category> categories = List<Category>();
+
+    for(int i=0;i<jsonData.length; i++) {
+      categories.add(fromJson(jsonData[i]));
+    }
+
+    return categories;
+  }
+
 }
 
+/*
 class CategoryList {
   List<Category> list = [];
 
@@ -409,3 +456,4 @@ class GuessYouLikeList {
     );
   }
 }
+*/

@@ -1,9 +1,11 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'globle.dart' as Globle;
+import 'globle.dart' as globle;
 import 'view/mainpage.dart';
+import 'utils/static_values.dart' as staticValues;
 import 'package:wx_reader/model/user.dart';
 
 void main() => runApp(MyApp());
@@ -11,6 +13,16 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   MyApp() {
     _loadConfig();
+
+    globle.dio = Dio();
+    globle.dio.options
+      ..baseUrl = staticValues.serverPath
+      ..connectTimeout = 5000 //5s
+      ..receiveTimeout = 5000
+      ..validateStatus = (int status) {
+        return status > 0;
+      };
+
   }
 
   _loadConfig() async {
@@ -20,7 +32,7 @@ class MyApp extends StatelessWidget {
       String userStr = prefs.getString('user');
       if(userStr != null && !userStr.isEmpty) {
         var data = jsonDecode(userStr);
-        Globle.user = User.fromJson(data);
+        globle.user = User.fromJson(data);
       }
 
     }catch(exception) {

@@ -1,13 +1,15 @@
 import 'dart:math';
 import 'dart:convert';
-import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:wx_reader/model/showcase.dart';
 import 'package:wx_reader/utils/styles.dart';
 import 'package:wx_reader/view/book_details.dart';
 import 'package:wx_reader/utils/static_values.dart';
 import 'package:wx_reader/model/book.dart';
 import 'package:wx_reader/globle.dart';
+import 'package:wx_reader/globle.dart' as globle;
 
 class DiscoverPage extends StatefulWidget {
   DiscoverPage() : super(key: Key(Random().nextDouble().toString()));
@@ -18,8 +20,8 @@ class DiscoverPage extends StatefulWidget {
 
 class _DiscoverPageState extends State<DiscoverPage> {
   Pop _pop;
-  RecommendList _recommendList;
-  ShowcaseList _showcaseList;
+  List<Book> _recommendList;
+  List<Showcase> _showcaseList;
   bool isLoading = false;
 
   initState() {
@@ -50,7 +52,13 @@ class _DiscoverPageState extends State<DiscoverPage> {
   }
 
   _loadFromWeb(String url) async {
-    print('load from web');
+    Response response = await globle.dio.get(url);
+    if(response != null) {
+      String dataStr = response.data;
+      print(dataStr);
+      _set(dataStr);
+    }
+    /*
     try {
       var data = null;
       var httpClient = HttpClient();
@@ -65,14 +73,16 @@ class _DiscoverPageState extends State<DiscoverPage> {
     catch(exception) {
       print('exception: ' + exception.toString());
     }
+    */
   }
 
-  _set(var data) {
+  _set(String dataStr) {
+    Map<String, dynamic> data = json.decode(dataStr);
     setState(() {
       isLoading = false;
       _pop = Pop.fromJson(data['pop']);
-      _recommendList = RecommendList.fromJson(data['recommend']);
-      _showcaseList = ShowcaseList.fromJson(data['showcase']);
+      _recommendList = Book.decodeList(data['recommend']);
+      _showcaseList = Showcase.decodeList(data['showcase']);
     });
   }
 
@@ -147,7 +157,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                               Navigator.push(context,
                                   MaterialPageRoute(
                                       fullscreenDialog: true,
-                                      builder: (context) => BookDetailsPage(id: _recommendList.list[0].id))
+                                      builder: (context) => BookDetailsPage(id: _recommendList[0].id))
                               );
                             },
                             child: Container(
@@ -160,7 +170,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                       height: 170.0,
 
                                       child: (_recommendList != null)?Image.network(
-                                        serverPath + _recommendList.list[0].cover,
+                                        serverPath + _recommendList[0].cover,
                                         fit: BoxFit.fill,
                                         ):Image.asset('static/img/dummy.png', fit: BoxFit.fill,),
                                     ),
@@ -168,9 +178,9 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                       padding: EdgeInsets.fromLTRB(0, 4.0, 0, 0),
                                       child: Text(
                                         (_recommendList != null)?
-                                            _recommendList.list[0].name.length > 10?
-                                              _recommendList.list[0].name.substring(0, 9) + '...':
-                                              _recommendList.list[0].name
+                                            _recommendList[0].name.length > 10?
+                                              _recommendList[0].name.substring(0, 9) + '...':
+                                              _recommendList[0].name
                                             :"",
                                       ),
 
@@ -186,7 +196,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                               Navigator.push(context,
                                   MaterialPageRoute(
                                       fullscreenDialog: true,
-                                      builder: (context) => BookDetailsPage(id: _recommendList.list[1].id))
+                                      builder: (context) => BookDetailsPage(id: _recommendList[1].id))
                               );
                             },
                             child: Container(
@@ -198,7 +208,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                     SizedBox(
                                       height: 170.0,
                                       child: (_recommendList != null)?Image.network(
-                                        serverPath + _recommendList.list[1].cover,
+                                        serverPath + _recommendList[1].cover,
                                         fit: BoxFit.fill,
                                       ):Image.asset('static/img/dummy.png', fit: BoxFit.fill,),
                                     ),
@@ -206,9 +216,9 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                       padding: EdgeInsets.fromLTRB(0, 4.0, 0, 0),
                                       child: Text(
                                         (_recommendList != null)?
-                                        _recommendList.list[1].name.length > 10?
-                                        _recommendList.list[1].name.substring(0, 9) + '...':
-                                        _recommendList.list[1].name
+                                        _recommendList[1].name.length > 10?
+                                        _recommendList[1].name.substring(0, 9) + '...':
+                                        _recommendList[1].name
                                             :"",
                                       ),
 
@@ -227,7 +237,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                               Navigator.push(context,
                                   MaterialPageRoute(
                                       fullscreenDialog: true,
-                                      builder: (context) => BookDetailsPage(id: _recommendList.list[2].id))
+                                      builder: (context) => BookDetailsPage(id: _recommendList[2].id))
                               );
                             },
                             child: Container(
@@ -239,7 +249,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                     SizedBox(
                                       height: 170.0,
                                       child: (_recommendList != null)?Image.network(
-                                        serverPath + _recommendList.list[2].cover,
+                                        serverPath + _recommendList[2].cover,
                                         fit: BoxFit.fill,
                                       ):Image.asset('static/img/dummy.png', fit: BoxFit.fill,),
                                     ),
@@ -247,9 +257,9 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                       padding: EdgeInsets.fromLTRB(0, 4.0, 0, 0),
                                       child: Text(
                                         (_recommendList != null)?
-                                        _recommendList.list[2].name.length > 10?
-                                        _recommendList.list[2].name.substring(0, 9) + '...':
-                                        _recommendList.list[2].name
+                                        _recommendList[2].name.length > 10?
+                                        _recommendList[2].name.substring(0, 9) + '...':
+                                        _recommendList[2].name
                                             :"",
                                       ),
 
@@ -264,7 +274,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                               Navigator.push(context,
                                   MaterialPageRoute(
                                       fullscreenDialog: true,
-                                      builder: (context) => BookDetailsPage(id: _recommendList.list[3].id))
+                                      builder: (context) => BookDetailsPage(id: _recommendList[3].id))
                               );
                             },
                             child: Container(
@@ -276,7 +286,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                     SizedBox(
                                       height: 170.0,
                                       child: (_recommendList != null)?Image.network(
-                                        serverPath + _recommendList.list[3].cover,
+                                        serverPath + _recommendList[3].cover,
                                         fit: BoxFit.fill,
                                       ):Image.asset('static/img/dummy.png', fit: BoxFit.fill,),
                                     ),
@@ -284,9 +294,9 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                       padding: EdgeInsets.fromLTRB(0, 4.0, 0, 0),
                                       child: Text(
                                         (_recommendList != null)?
-                                        _recommendList.list[3].name.length > 10?
-                                        _recommendList.list[3].name.substring(0, 9) + '...':
-                                        _recommendList.list[3].name
+                                        _recommendList[3].name.length > 10?
+                                        _recommendList[3].name.substring(0, 9) + '...':
+                                        _recommendList[3].name
                                             :"",
                                       ),
 
@@ -310,7 +320,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
     ];
 
     if(_showcaseList != null) {
-      for(Showcase showcase in _showcaseList.list) {
+      for(Showcase showcase in _showcaseList) {
         pageList.add(Padding(
           padding: EdgeInsets.all(8.0),
           child: Card(
@@ -388,7 +398,7 @@ class Pop {
 
   Pop({this.title, this.subtitle, this.background, this.url});
 
-  factory Pop.fromJson(Map<String, dynamic> json) {
+  static fromJson(Map<String, dynamic> json) {
     return Pop(
       title: json['title'],
       subtitle: json['subtitle'],
@@ -399,6 +409,7 @@ class Pop {
 
 }
 
+/*
 class RecommendList {
   List<Book> list = [];
 
@@ -412,27 +423,10 @@ class RecommendList {
     );
   }
 }
+*/
 
-class Showcase {
-  String banner;
-  String leading;
-  String title;
-  String subtitle;
-  String trailing;
 
-  Showcase({this.banner, this.leading, this.title, this.subtitle, this.trailing});
-
-  factory Showcase.fromJson(Map<String, dynamic> json) {
-    return Showcase(
-      banner: json['banner'],
-      leading: json['leading'],
-      title: json['title'],
-      subtitle: json['subtitle'],
-      trailing: json['trailing'],
-    );
-  }
-}
-
+/*
 class ShowcaseList {
   List<Showcase> list = [];
 
@@ -446,3 +440,4 @@ class ShowcaseList {
     );
   }
 }
+*/

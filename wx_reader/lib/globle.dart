@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:quiver/cache.dart';
 import 'package:wx_reader/model/user.dart';
 
@@ -6,3 +7,5 @@ import 'package:wx_reader/model/user.dart';
 */
 User user;
 MapCache<String, String> mapCache = MapCache.lru(maximumSize: 512);
+
+Dio dio;
