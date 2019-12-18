@@ -10,11 +10,11 @@
             android:src="@drawable/splash_bg" />
     </item>
     <item
-        android:top="128dp"
+        android:top="188dp"
         android:gravity="center_horizontal"
-        android:width="76dp"
-        android:height="76dp">
+        android:width="160dp"
+        android:height="36dp">
         <bitmap
-            android:src="@drawable/logo" />
+            android:src="@drawable/splash_logo" />
     </item>
 </layer-list>

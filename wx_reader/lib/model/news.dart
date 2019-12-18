@@ -7,7 +7,7 @@ class News {
 
   News({this.id, this.title, this.brief, this.img, this.content});
 
-  factory News.fromJson(Map<String, dynamic> json) {
+  static fromJson(Map<String, dynamic> json) {
     return News(
       id: json['id'],
       title: json['title'],
@@ -15,6 +15,16 @@ class News {
       img: json['img'],
       content: json['content'],
     );
+  }
+
+  static List<News> decodeList(var jsonData) {
+    List<News> books = List<News>();
+
+    for(int i=0;i<jsonData.length; i++) {
+      books.add(fromJson(jsonData[i]));
+    }
+
+    return books;
   }
 
 }
