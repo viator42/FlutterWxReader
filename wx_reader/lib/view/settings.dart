@@ -14,6 +14,7 @@ class SettingsPage extends StatefulWidget {
 }
 
 class SettingsPageState extends State<SettingsPage> {
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -44,11 +45,13 @@ class SettingsPageState extends State<SettingsPage> {
               textColor: Colors.white,
               child: Text('退出登录'),
               onPressed: () {
-                _doLogout();
+                _showLogoutDialog();
+//                    setState(() {
+//                      isShowingLogoutDialog = true;
+//                    });
               },
             ),
           ),
-
         ],
       ),
     );
@@ -62,6 +65,38 @@ class SettingsPageState extends State<SettingsPage> {
     await prefs.remove('user');
 
     Navigator.pop(context);
+  }
+
+  Future<void> _showLogoutDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('退出登录'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text("是否退出登录？")
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+                onPressed: () {
+                  _doLogout();
+                  Navigator.of(context).pop();
+                },
+                child: Text('确定')),
+            FlatButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('取消')),
+          ],
+        );
+      }
+    );
   }
 
 }

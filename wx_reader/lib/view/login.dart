@@ -20,9 +20,6 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController _telController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
 
-  bool isShowingErrDialog = false;
-  String errMsg = '';
-
   @override
   void initState() {
     // TODO: implement initState
@@ -97,15 +94,13 @@ class _LoginPageState extends State<LoginPage> {
 
                         if(tel == null || tel.isEmpty) {
                           setState(() {
-                            errMsg = '手机号不能为空';
-                            isShowingErrDialog = true;
+                            _showErrDialog('手机号不能为空');
                           });
                           return;
                         }
                         if(password == null || password.isEmpty) {
                           setState(() {
-                            errMsg = '密码不能为空';
-                            isShowingErrDialog = true;
+                            _showErrDialog('密码不能为空');
                           });
                           return;
                         }
@@ -120,22 +115,6 @@ class _LoginPageState extends State<LoginPage> {
 
               ],
             ),
-          ),
-        ),
-        Opacity(
-          opacity: isShowingErrDialog?1.0:0,
-          child: CupertinoAlertDialog(
-            title: Text('登录失败'),
-            content: Text(errMsg),
-            actions: <Widget>[
-              CupertinoDialogAction(
-                  onPressed: () {
-                    setState(() {
-                      isShowingErrDialog = false;
-                    });
-                  },
-                  child: Text('好'))
-            ],
           ),
         ),
 
@@ -164,8 +143,7 @@ class _LoginPageState extends State<LoginPage> {
       }
       else {
         setState(() {
-          errMsg = data['msg'];
-          isShowingErrDialog = true;
+          _showErrDialog(data['msg']);
         });
       }
     }
@@ -173,6 +151,32 @@ class _LoginPageState extends State<LoginPage> {
       print('exception: ' + exception.toString());
     }
 
+  }
+
+  Future<void> _showErrDialog(String msg) async {
+    return showDialog<void>(
+        context: context,
+        barrierDismissible: false, // user must tap button!
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('登录失败'),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  Text(msg)
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('关闭')),
+            ],
+          );
+        }
+    );
   }
 
 }

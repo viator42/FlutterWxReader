@@ -4,11 +4,13 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:wx_reader/api/api.dart';
+import 'package:wx_reader/model/user.dart';
+import 'package:wx_reader/utils/common_utils.dart';
 import 'package:wx_reader/utils/styles.dart';
 import 'package:wx_reader/utils/static_values.dart';
 import 'package:wx_reader/model/book.dart';
 import 'package:wx_reader/model/comment.dart';
-import 'package:wx_reader/globle.dart';
+import 'package:wx_reader/globle.dart' as globle;
 
 class BookDetailsPage extends StatefulWidget {
   int id;
@@ -27,6 +29,7 @@ class _BookDetailsState extends State<BookDetailsPage> {
   Book _book;
   BookCommentList _bookCommentList;
   bool _isLoading = false;
+  User _user;
 
   _BookDetailsState(this.id);
 
@@ -35,6 +38,10 @@ class _BookDetailsState extends State<BookDetailsPage> {
   }
 
   _load() async {
+    int userId = 0;
+    if(_user!=null) {
+      userId = _user.id;
+    }
     String detailUrl = '/app/book/detail/?id=' + id.toString();
     String commentUrl = '/app/book/comment/?book=' + id.toString();
 
@@ -42,7 +49,7 @@ class _BookDetailsState extends State<BookDetailsPage> {
       _isLoading = true;
     });
 
-    mapCache.get(detailUrl).then((value){
+    globle.mapCache.get(detailUrl).then((value){
       if(value != null && value.isNotEmpty) {
         _setDetail(jsonDecode(value));
       }
@@ -51,7 +58,7 @@ class _BookDetailsState extends State<BookDetailsPage> {
       }
     });
 
-    mapCache.get(commentUrl).then((value){
+    globle.mapCache.get(commentUrl).then((value){
       if(value != null && value.isNotEmpty) {
         _setComment(jsonDecode(value));
       }
@@ -62,6 +69,9 @@ class _BookDetailsState extends State<BookDetailsPage> {
 
   }
 
+  /**
+   * 读取书籍信息
+   */
   _loadDetailFromWeb(String url) async {
     var httpClient = HttpClient();
     try {
@@ -71,7 +81,7 @@ class _BookDetailsState extends State<BookDetailsPage> {
 
       var json = await response.transform(utf8.decoder).join();
       var data = jsonDecode(json);
-      mapCache.set(url, jsonEncode(data));
+      globle.mapCache.set(url, jsonEncode(data));
       _setDetail(data);
     }
     catch(exception) {
@@ -94,7 +104,7 @@ class _BookDetailsState extends State<BookDetailsPage> {
 
       var json = await response.transform(utf8.decoder).join();
       var data = jsonDecode(json);
-      mapCache.set(url, jsonEncode(data));
+      globle.mapCache.set(url, jsonEncode(data));
       _setComment(data);
     }
     catch(exception) {
@@ -113,6 +123,7 @@ class _BookDetailsState extends State<BookDetailsPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    _user = globle.user;
     _reload();
   }
 
@@ -378,12 +389,20 @@ class _BookDetailsState extends State<BookDetailsPage> {
                   children: <Widget>[
                     Expanded(
                       child: FlatButton(onPressed: () {
-                        _addToBookShelf();
+                        if(_user != null) {
+                          _addToBookShelf();
+                        }
+                        else {
+                          CommonUtils.showToast("需要登录");
+                        }
+
                       },
-                          child: Text('添加到书架')),
+                          child: Text('添加到书架')
+                      ),
                     ),
                     Expanded(
-                      child: FlatButton(onPressed: null, child: Text('开始阅读')),
+                      child: FlatButton(onPressed: () {
+                      }, child: Text('开始阅读')),
                     ),
                     Expanded(
                       child: FlatButton(onPressed: null, child: Text('下载')),
@@ -409,14 +428,26 @@ class _BookDetailsState extends State<BookDetailsPage> {
     );
   }
 
+  /**
+   * 添加到书架
+   */
   _addToBookShelf() async {
-//    Response data = await Api.listBookShelf();
-//    if(data != null) {
-//      print(data.data.toString());
-//    }
-//    else {
-//
-//    }
+    FormData formData = FormData.fromMap({
+      "userId": _user.id,
+      "bookId": id,
+    });
+    Response response = await globle.dio.post("/app/book/shelf/add/",
+        data: formData
+    );
+    if(response != null) {
+      String dataStr = response.data;
+      print(dataStr);
+      var data = json.decode(dataStr);
+      CommonUtils.showToast(data['msg']);
+    }
+    else {
+      CommonUtils.showToast("添加失败");
+    }
   }
 
 }

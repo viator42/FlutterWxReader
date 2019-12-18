@@ -28,6 +28,8 @@ class _DiscoverPageState extends State<DiscoverPage> {
     _reload();
   }
 
+
+
   _reload() {
     _load();
   }
@@ -98,6 +100,9 @@ class _DiscoverPageState extends State<DiscoverPage> {
                 alignment: Alignment.center,
                 widthFactor: 1.0,
                 heightFactor: 1.0,
+//                child: CachedNetworkImage(
+//                  imageUrl: serverPath + _pop.background,
+//                ),
                 child: (_pop != null)?Image.network(
                     serverPath + _pop.background,
                     fit: BoxFit.cover,
