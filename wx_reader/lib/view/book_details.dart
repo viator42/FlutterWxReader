@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:wx_reader/api/api.dart';
 import 'package:wx_reader/model/user.dart';
 import 'package:wx_reader/utils/common_utils.dart';
 import 'package:wx_reader/utils/styles.dart';
