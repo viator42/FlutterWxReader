@@ -41,3 +41,4 @@ final priceTextStyle = TextStyle(
 final originalPriceTextStyle = TextStyle(
   decoration: TextDecoration.lineThrough,
 );
+

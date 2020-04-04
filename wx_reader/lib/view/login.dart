@@ -63,24 +63,41 @@ class _LoginPageState extends State<LoginPage> {
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.fromLTRB(80.0, 8.0, 80.0, 8.0),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: '手机号',
+                  child: Container(
+                    height: 42,
+                    child: TextField(
+                      textAlignVertical: TextAlignVertical.bottom,
+                      textAlign: TextAlign.start,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15.0),
+                        ),
+                        hintText: '手机号',
+                      ),
+                      controller: _telController,
                     ),
-                    controller: _telController,
                   ),
+
                 ),
                 Padding(
                   padding: EdgeInsets.fromLTRB(80.0, 8.0, 80.0, 8.0),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: '密码',
+                  child: Container(
+                    height: 42,
+                    child: TextField(
+                      textAlignVertical: TextAlignVertical.bottom,
+                      textAlign: TextAlign.start,
+                      decoration: InputDecoration(
+                        alignLabelWithHint: true,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15.0),
+                        ),
+                        hintText: '密码',
+                      ),
+                      obscureText: true,
+                      controller: _passwordController,
                     ),
-                    obscureText: true,
-                    controller: _passwordController,
                   ),
+
                 ),
 
                 Padding(

@@ -40,7 +40,7 @@ class _RegisterPageState extends State<RegisterPage> {
               child: TextField(
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: '手机号',
+                  hintText: '手机号',
                 ),
                 controller: _telController,
               ),
@@ -50,7 +50,7 @@ class _RegisterPageState extends State<RegisterPage> {
               child: TextField(
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: '密码',
+                  hintText: '密码',
                 ),
                 controller: _passwordController,
               ),
