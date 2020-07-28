@@ -7,11 +7,8 @@ class CommonUtils {
         msg: msg,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.CENTER,
-        timeInSecForIos: 1,
         backgroundColor: Colors.white70,
         textColor: Colors.black54,
-        fontSize: 16.0
-    );
+        fontSize: 16.0);
   }
-
 }

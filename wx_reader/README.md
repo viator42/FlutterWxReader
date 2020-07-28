@@ -1,6 +1,6 @@
 # wx_reader
 
-一个模仿微信读书的示例App
+A new Flutter application.
 
 ## Getting Started
 
